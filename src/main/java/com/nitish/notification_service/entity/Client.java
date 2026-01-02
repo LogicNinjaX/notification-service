@@ -14,7 +14,8 @@ import java.util.UUID;
 @Table(
         name = "client_table",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_name", columnNames = {"name"})
+                @UniqueConstraint(name = "uk_name", columnNames = {"name"}),
+                @UniqueConstraint(name = "uk_email", columnNames = {"email"})
         }
 )
 public class Client {
@@ -24,7 +25,10 @@ public class Client {
     private UUID clientId;
 
     @Column(nullable = false)
-    private String name;
+    private String fullName;
+
+    @Column(nullable = false)
+    private String email;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -47,12 +51,20 @@ public class Client {
         this.clientId = clientId;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public ClientStatus getStatus() {
