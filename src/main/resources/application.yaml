@@ -16,3 +16,6 @@ spring:
         format_sql: true
         highlight_sql: true
     show-sql: true
+
+  messages:
+    basename: messages
