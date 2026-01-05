@@ -14,7 +14,7 @@ import java.util.UUID;
 @Table(
         name = "client_table",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_name", columnNames = {"name"}),
+                @UniqueConstraint(name = "uk_name", columnNames = {"fullName"}),
                 @UniqueConstraint(name = "uk_email", columnNames = {"email"})
         }
 )
