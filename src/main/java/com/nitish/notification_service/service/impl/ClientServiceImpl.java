@@ -63,14 +63,14 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     @Override
     public ClientUpdateResponse updateClientInfo(UUID clientId, ClientUpdateRequest request) {
-        Client client = clientRepository.findById(clientId)
+        Client existingClient = clientRepository.findById(clientId)
                 .orElseThrow(() -> new EntityNotFoundException("client", clientId));
 
-        client.setFullName(request.getFullName());
-        client.setEmail(request.getEmail());
-        client = clientRepository.save(client);
-        logger.info("client details updated successfully [id={}, name={}]", clientId, client.getFullName());
-        return clientMapper.toUpdateResponse(client);
+        if (request.getEmail() != null) existingClient.setEmail(request.getEmail());
+        if (request.getFullName() != null) existingClient.setFullName(request.getFullName());
+        existingClient = clientRepository.save(existingClient);
+        logger.info("client details updated successfully [id={}, name={}]", clientId, existingClient.getFullName());
+        return clientMapper.toUpdateResponse(existingClient);
     }
 
 
