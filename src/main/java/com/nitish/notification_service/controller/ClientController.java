@@ -36,7 +36,7 @@ public class ClientController {
     }
 
     @PatchMapping(path = "/client/{clientId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<ClientUpdateResponse>> updateClient(@PathVariable UUID clientId, @RequestBody ClientUpdateRequest request){
+    public ResponseEntity<ApiResponse<ClientUpdateResponse>> updateClient(@PathVariable UUID clientId, @Valid @RequestBody ClientUpdateRequest request){
         ClientUpdateResponse response = clientService.updateClientInfo(clientId,request);
         return ResponseEntity.ok(ApiResponse.success(response, "client updated successfully"));
     }
