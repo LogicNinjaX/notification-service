@@ -13,8 +13,6 @@ public record UserDetailsResponse
 
                 String email,
 
-                String password,
-
                 UserRole role,
 
                 LocalDateTime createdAt,
