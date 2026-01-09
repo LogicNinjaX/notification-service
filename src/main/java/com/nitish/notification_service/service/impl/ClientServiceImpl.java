@@ -66,8 +66,8 @@ public class ClientServiceImpl implements ClientService {
         Client existingClient = clientRepository.findById(clientId)
                 .orElseThrow(() -> new EntityNotFoundException("client", clientId));
 
-        if (request.getEmail() != null) existingClient.setEmail(request.getEmail());
-        if (request.getFullName() != null) existingClient.setFullName(request.getFullName());
+        if (request.email() != null) existingClient.setEmail(request.email());
+        if (request.fullName() != null) existingClient.setFullName(request.fullName());
         existingClient = clientRepository.save(existingClient);
         logger.info("client details updated successfully [id={}, name={}]", clientId, existingClient.getFullName());
         return clientMapper.toUpdateResponse(existingClient);
