@@ -15,7 +15,8 @@ import java.util.UUID;
         name = "user_table",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_username", columnNames = {"username"}),
-                @UniqueConstraint(name = "uk_email", columnNames = {"email"})
+                @UniqueConstraint(name = "uk_email", columnNames = {"email"}),
+                @UniqueConstraint(name = "uk_password", columnNames = {"password"})
         }
 )
 public class User {
@@ -29,6 +30,9 @@ public class User {
 
     @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false)
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -72,6 +76,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public UserRole getRole() {
