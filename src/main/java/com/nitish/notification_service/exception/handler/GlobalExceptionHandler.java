@@ -1,6 +1,8 @@
 package com.nitish.notification_service.exception.handler;
 
 import com.nitish.notification_service.dto.response.ApiResponse;
+import com.nitish.notification_service.exception.custom_exception.DuplicateFieldException;
+import com.nitish.notification_service.exception.custom_exception.EntityNotFoundException;
 import com.nitish.notification_service.exception.custom_exception.InvalidStatusException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -39,6 +41,18 @@ public class GlobalExceptionHandler {
                         Collections.singletonMap("details", e.getMessage())
                 )
         );
+    }
+
+    @ExceptionHandler(DuplicateFieldException.class)
+    public ResponseEntity<ApiResponse<Void>> duplicateFieldHandler(DuplicateFieldException e){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("duplicate input found", Collections.singletonMap("details", e.getMessage())));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> entityNotFoundHandler(EntityNotFoundException e){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("record not found", Collections.singletonMap("details", e.getMessage())));
     }
 
 }
