@@ -5,55 +5,16 @@ import com.nitish.notification_service.enums.ClientStatus;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class ClientRegisterResponse {
+public record ClientRegisterResponse
+        (
+                UUID clientId,
 
-    private UUID clientId;
+                String fullName,
 
-    private String fullName;
+                String email,
 
-    private String email;
+                ClientStatus status,
 
-    private ClientStatus status;
+                LocalDateTime createdAt
+        ) { }
 
-    private LocalDateTime createdAt;
-
-    public UUID getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(UUID clientId) {
-        this.clientId = clientId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public ClientStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ClientStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-}
