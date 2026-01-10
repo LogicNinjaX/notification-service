@@ -55,4 +55,10 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("record not found", Collections.singletonMap("details", e.getMessage())));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> illegalArgumentHandler(IllegalArgumentException e){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("invalid input found", Collections.singletonMap("details", e.getMessage())));
+    }
+
 }
