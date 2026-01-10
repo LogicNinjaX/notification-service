@@ -5,17 +5,19 @@ import com.nitish.notification_service.dto.request.UserUpdateRequest;
 import com.nitish.notification_service.dto.response.UserDetailsResponse;
 import com.nitish.notification_service.dto.response.UserRegisterResponse;
 import com.nitish.notification_service.dto.response.UserUpdateResponse;
+import com.nitish.notification_service.entity.Client;
 import com.nitish.notification_service.entity.User;
 import com.nitish.notification_service.enums.UserRole;
 import com.nitish.notification_service.exception.custom_exception.DuplicateFieldException;
 import com.nitish.notification_service.exception.custom_exception.EntityNotFoundException;
+import com.nitish.notification_service.repository.ClientRepository;
 import com.nitish.notification_service.repository.UserRepository;
 import com.nitish.notification_service.service.UserService;
 import com.nitish.notification_service.util.mapper.UserMapper;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -25,19 +27,26 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
     private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, ClientRepository clientRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
         this.userMapper = userMapper;
     }
 
     @Override
-    public UserRegisterResponse registerUser(UserRegisterRequest request){
+    public UserRegisterResponse registerUser(UserRegisterRequest request) {
+        Client client = clientRepository.findById(request.clientId())
+                .orElseThrow(() -> new EntityNotFoundException("client", request.clientId()));
+
         User user = userMapper.toUser(request);
+        user.setRole(UserRole.USER);
         try {
+            user.setClient(client);
             user = userRepository.save(user);
-        }catch (ConstraintViolationException e){
+        } catch (DataIntegrityViolationException e) {
             String message = e.getMessage();
             if (message.contains("uk_username")) throw new DuplicateFieldException("username already exists");
             if (message.contains("uk_email")) throw new DuplicateFieldException("email already exists");
@@ -48,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailsResponse getUser(UUID userId){
+    public UserDetailsResponse getUser(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("user", userId));
         return userMapper.toDetailsResponse(user);
@@ -56,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserUpdateResponse updateUserDetails(UUID userId, UserUpdateRequest request){
+    public UserUpdateResponse updateUserDetails(UUID userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("user", userId));
 
@@ -71,14 +80,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUser(UUID userId){
+    public void deleteUser(UUID userId) {
         int updatedRows = userRepository.deleteUser(userId);
         if (updatedRows > 0) logger.info("user record updated successfully [id={}]", userId);
     }
 
     @Transactional
     @Override
-    public void updateUserRole(UUID userId, UserRole userRole){
+    public void updateUserRole(UUID userId, UserRole userRole) {
         int updatedRows = userRepository.updateUserRole(userId, userRole);
         if (updatedRows > 0) logger.info("user role updated successfully [id={}, role={}]", userId, userRole);
     }
