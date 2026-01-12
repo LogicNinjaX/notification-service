@@ -63,12 +63,17 @@ public class TemplateUtil {
 
 
     public String sanitizeHtml(String html){
-        return Jsoup.clean(html, Safelist.basicWithImages());
+        Safelist safelist = Safelist.relaxed()
+                .addTags("h1", "h2", "h3", "table", "tr", "td", "th")
+                .addAttributes(":all", "style")
+                .addProtocols("img", "src", "cid", "http", "https");
+
+        return Jsoup.clean(html, safelist);
     }
 
     public boolean isHtml(String content){
         Document document = Jsoup.parse(content);
-        return !document.body().children().isEmpty();
+        return document.body().children().isEmpty();
     }
 
     public String toJson(Set<String> placeholders) {
