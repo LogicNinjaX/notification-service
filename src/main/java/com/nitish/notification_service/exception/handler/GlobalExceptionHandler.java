@@ -4,6 +4,7 @@ import com.nitish.notification_service.dto.response.ApiResponse;
 import com.nitish.notification_service.exception.custom_exception.DuplicateFieldException;
 import com.nitish.notification_service.exception.custom_exception.EntityNotFoundException;
 import com.nitish.notification_service.exception.custom_exception.InvalidStatusException;
+import com.nitish.notification_service.exception.custom_exception.TemplateValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +60,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> illegalArgumentHandler(IllegalArgumentException e){
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error("invalid input found", Collections.singletonMap("details", e.getMessage())));
+    }
+
+    @ExceptionHandler(TemplateValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> templateValidationHandler(TemplateValidationException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("invalid content found", Collections.singletonMap("details", e.getMessage())));
     }
 
 }
