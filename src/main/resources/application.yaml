@@ -19,3 +19,12 @@ spring:
 
   messages:
     basename: messages
+
+
+app:
+  notification:
+    channel-type:
+      sms:
+        content-length: ${SMS_LENGTH}
+      push:
+        content-length: ${PUSH_LENGTH}
