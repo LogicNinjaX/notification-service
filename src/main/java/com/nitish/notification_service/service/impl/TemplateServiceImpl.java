@@ -7,6 +7,7 @@ import com.nitish.notification_service.entity.NotificationTemplate;
 import com.nitish.notification_service.entity.User;
 import com.nitish.notification_service.enums.ContentType;
 import com.nitish.notification_service.enums.NotificationChannel;
+import com.nitish.notification_service.enums.TemplateStatus;
 import com.nitish.notification_service.exception.custom_exception.DuplicateFieldException;
 import com.nitish.notification_service.exception.custom_exception.EntityNotFoundException;
 import com.nitish.notification_service.exception.custom_exception.TemplateValidationException;
@@ -16,6 +17,9 @@ import com.nitish.notification_service.repository.UserRepository;
 import com.nitish.notification_service.service.TemplateService;
 import com.nitish.notification_service.util.mapper.TemplateMapper;
 import com.nitish.notification_service.util.TemplateUtil;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +34,7 @@ public class TemplateServiceImpl implements TemplateService {
     private final ClientRepository clientRepository;
     private final TemplateMapper templateMapper;
     private final TemplateUtil templateUtil;
+    private static final Logger logger = LoggerFactory.getLogger(TemplateServiceImpl.class);
 
     public TemplateServiceImpl(TemplateRepository templateRepository, UserRepository userRepository, ClientRepository clientRepository, TemplateMapper templateMapper, TemplateUtil templateUtil) {
         this.templateRepository = templateRepository;
@@ -39,6 +44,7 @@ public class TemplateServiceImpl implements TemplateService {
         this.templateUtil = templateUtil;
     }
 
+    @Transactional
     @Override
     public CreateTemplateResponse createTemplate(UUID userId, CreateTemplateRequest request){
 
@@ -73,16 +79,21 @@ public class TemplateServiceImpl implements TemplateService {
         template.setPlaceholders(templateUtil.toJson(placeHolders));
         template.setCreatedBy(user);
         template.setClient(client);
+        template.setStatus(TemplateStatus.INACTIVE);
 
 
         try {
-            template = templateRepository.save(template);
+            template = templateRepository.saveAndFlush(template);
         }catch (DataIntegrityViolationException e){
             if (e.getMessage().contains("uk_client_template_name")){
                 throw new DuplicateFieldException("template already exists");
             }
             throw e;
         }
+        logger.info(
+                "template created successfully [template id={}, channel type={}, created by={}, client={}]",
+                template.getTemplateId(), template.getChannel(), template.getCreatedBy().getUserId(), template.getClient().getClientId()
+        );
         return templateMapper.toCreateResponse(template);
     }
 }
