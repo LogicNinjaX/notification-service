@@ -2,6 +2,7 @@ package com.nitish.notification_service.util.mapper;
 
 import com.nitish.notification_service.dto.request.CreateTemplateRequest;
 import com.nitish.notification_service.dto.response.CreateTemplateResponse;
+import com.nitish.notification_service.dto.response.TemplateResponse;
 import com.nitish.notification_service.dto.response.UpdateTemplateResponse;
 import com.nitish.notification_service.entity.NotificationTemplate;
 import org.mapstruct.Mapper;
@@ -23,4 +24,6 @@ public interface TemplateMapper {
     CreateTemplateResponse toCreateResponse(NotificationTemplate template);
 
     UpdateTemplateResponse toUpdateResponse(NotificationTemplate template);
+
+    TemplateResponse toTemplateResponse(NotificationTemplate template);
 }
