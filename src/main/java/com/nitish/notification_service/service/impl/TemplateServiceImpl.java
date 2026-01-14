@@ -3,6 +3,7 @@ package com.nitish.notification_service.service.impl;
 import com.nitish.notification_service.dto.request.CreateTemplateRequest;
 import com.nitish.notification_service.dto.request.UpdateTemplateRequest;
 import com.nitish.notification_service.dto.response.CreateTemplateResponse;
+import com.nitish.notification_service.dto.response.TemplateResponse;
 import com.nitish.notification_service.dto.response.UpdateTemplateResponse;
 import com.nitish.notification_service.entity.Client;
 import com.nitish.notification_service.entity.NotificationTemplate;
@@ -23,8 +24,10 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -129,5 +132,12 @@ public class TemplateServiceImpl implements TemplateService {
         logger.info("template record updated successfully [template id={}]", template.getTemplateId());
 
         return templateMapper.toUpdateResponse(template);
+    }
+
+    @Override
+    public List<TemplateResponse> getTemplateByCreatorId(UUID creatorId, Pageable pageable){
+        return templateRepository.getTemplatesByCreatorId(creatorId, pageable)
+                .map(templateMapper::toTemplateResponse)
+                .toList();
     }
 }
