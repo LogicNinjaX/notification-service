@@ -3,6 +3,7 @@ package com.nitish.notification_service.service.impl;
 import com.nitish.notification_service.dto.request.CreateTemplateRequest;
 import com.nitish.notification_service.dto.request.UpdateTemplateRequest;
 import com.nitish.notification_service.dto.response.CreateTemplateResponse;
+import com.nitish.notification_service.dto.response.PageResponse;
 import com.nitish.notification_service.dto.response.TemplateResponse;
 import com.nitish.notification_service.dto.response.UpdateTemplateResponse;
 import com.nitish.notification_service.entity.Client;
@@ -24,6 +25,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -135,9 +137,16 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public List<TemplateResponse> getTemplateByCreatorId(UUID creatorId, Pageable pageable){
-        return templateRepository.getTemplatesByCreatorId(creatorId, pageable)
-                .map(templateMapper::toTemplateResponse)
-                .toList();
+    public PageResponse<TemplateResponse> getTemplateByCreatorId(UUID creatorId, Pageable pageable){
+        Page<TemplateResponse> page = templateRepository.getTemplatesByCreatorId(creatorId, pageable)
+                .map(templateMapper::toTemplateResponse);
+        return PageResponse.from(page);
+
+    }
+
+    @Override
+    public void deleteTemplateByUserAndTemplateId(UUID userId, UUID templateId){
+        int updatedRows = templateRepository.deleteTemplateById(templateId, userId);
+        if (updatedRows > 0) logger.info("template record deleted successfully [template id={}, user id={}]", templateId, userId);
     }
 }
