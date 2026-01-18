@@ -1,5 +1,6 @@
 package com.nitish.notification_service.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nitish.notification_service.enums.NotificationChannel;
 import com.nitish.notification_service.exception.custom_exception.TemplateValidationException;
@@ -83,5 +84,18 @@ public class TemplateUtil {
             throw new TemplateValidationException("Failed to serialize placeholders");
         }
     }
+
+    public String[] toStringArray(String jsonArray) throws JsonProcessingException {
+        return mapper.readValue(jsonArray, String[].class);
+    }
+
+    public String convertToThymeleafSyntax(String template) {
+
+        return template.replaceAll(
+                "\\{\\{(\\w+)}}",
+                "[[\\${$1}]]"
+        );
+    }
+
 
 }
