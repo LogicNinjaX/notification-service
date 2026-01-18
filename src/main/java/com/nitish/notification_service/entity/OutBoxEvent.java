@@ -4,7 +4,6 @@ import com.nitish.notification_service.enums.AggregateType;
 import com.nitish.notification_service.enums.EventStatus;
 import com.nitish.notification_service.enums.EventType;
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -17,17 +16,20 @@ public class OutBoxEvent {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID eventId;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AggregateType aggregateType;
 
     @Column(nullable = false)
     private UUID aggregateId;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventType eventType;
 
     private String payload;
 
+    @Enumerated(EnumType.STRING)
     private EventStatus status;
 
     @CreationTimestamp
