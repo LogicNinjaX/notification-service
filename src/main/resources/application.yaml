@@ -35,6 +35,18 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_UNAME}
+    password: ${SMTP_PASS}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 
 app:
   notification:
