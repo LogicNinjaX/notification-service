@@ -76,6 +76,14 @@ public class NotificationDelivery {
         this.attemptNumber = attemptNumber;
     }
 
+    public String getProviderResponse() {
+        return providerResponse;
+    }
+
+    public void setProviderResponse(String providerResponse) {
+        this.providerResponse = providerResponse;
+    }
+
     public LocalDateTime getSentAt() {
         return sentAt;
     }
@@ -91,4 +99,26 @@ public class NotificationDelivery {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public static NotificationDelivery success(NotificationMessage msg, NotificationChannel channel) {
+        NotificationDelivery delivery = new NotificationDelivery();
+        delivery.setMessage(msg);
+        delivery.setChannel(channel);
+        delivery.setStatus(DeliveryStatus.SUCCESS);
+        delivery.setAttemptNumber(delivery.getAttemptNumber() + 1);
+        delivery.setSentAt(LocalDateTime.now());
+        return delivery;
+    }
+
+    public static NotificationDelivery failure(NotificationMessage msg, NotificationChannel channel, String response) {
+        NotificationDelivery delivery = new NotificationDelivery();
+        delivery.setMessage(msg);
+        delivery.setChannel(channel);
+        delivery.setStatus(DeliveryStatus.FAILED);
+        delivery.setAttemptNumber(delivery.getAttemptNumber() + 1);
+        delivery.setProviderResponse(response);
+        delivery.setSentAt(LocalDateTime.now());
+        return delivery;
+    }
+
 }
