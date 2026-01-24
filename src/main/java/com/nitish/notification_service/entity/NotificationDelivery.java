@@ -100,22 +100,22 @@ public class NotificationDelivery {
         this.updatedAt = updatedAt;
     }
 
-    public static NotificationDelivery success(NotificationMessage msg, NotificationChannel channel) {
+    public static NotificationDelivery success(NotificationMessage msg, NotificationChannel channel, int retryCount) {
         NotificationDelivery delivery = new NotificationDelivery();
         delivery.setMessage(msg);
         delivery.setChannel(channel);
         delivery.setStatus(DeliveryStatus.SUCCESS);
-        delivery.setAttemptNumber(delivery.getAttemptNumber() + 1);
+        delivery.setAttemptNumber(retryCount + 1);
         delivery.setSentAt(LocalDateTime.now());
         return delivery;
     }
 
-    public static NotificationDelivery failure(NotificationMessage msg, NotificationChannel channel, String response) {
+    public static NotificationDelivery failure(NotificationMessage msg, NotificationChannel channel, String response, int retryCount) {
         NotificationDelivery delivery = new NotificationDelivery();
         delivery.setMessage(msg);
         delivery.setChannel(channel);
         delivery.setStatus(DeliveryStatus.FAILED);
-        delivery.setAttemptNumber(delivery.getAttemptNumber() + 1);
+        delivery.setAttemptNumber(retryCount + 1);
         delivery.setProviderResponse(response);
         delivery.setSentAt(LocalDateTime.now());
         return delivery;
