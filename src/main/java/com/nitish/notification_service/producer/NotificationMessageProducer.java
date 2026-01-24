@@ -6,6 +6,7 @@ import com.nitish.notification_service.repository.OutBoxEventRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -25,9 +26,9 @@ public class NotificationMessageProducer {
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 60000)
     public void produceMessage() {
-        List<OutBoxEvent> eventList = eventRepository.getEventsByStatus(EventStatus.NEW);
+        List<OutBoxEvent> eventList = eventRepository.getEventsByStatus(EventStatus.NEW, PageRequest.ofSize(50));
 
         for (OutBoxEvent event : eventList) {
             kafkaTemplate.send("notification-message", event);
