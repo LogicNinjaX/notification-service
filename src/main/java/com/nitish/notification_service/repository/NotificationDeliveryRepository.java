@@ -10,8 +10,8 @@ import java.util.UUID;
 public interface NotificationDeliveryRepository extends JpaRepository<NotificationDelivery, UUID> {
 
     @Query("""
-            select nd from NotificationDelivery nd
-            where nd.message.messageId = :messageId
+            SELECT nd FROM NotificationDelivery nd
+            WHERE nd.message.messageId = :messageId
             """)
     Optional<NotificationDelivery> findByMessageId(UUID messageId);
 }
