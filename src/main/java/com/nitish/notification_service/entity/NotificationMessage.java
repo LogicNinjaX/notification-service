@@ -42,6 +42,9 @@ public class NotificationMessage {
     @Enumerated(EnumType.STRING)
     private MessageStatus status;
 
+    @Column(nullable = false)
+    private int retryCount;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -102,6 +105,14 @@ public class NotificationMessage {
 
     public void setStatus(MessageStatus status) {
         this.status = status;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
     }
 
     public LocalDateTime getCreatedAt() {
