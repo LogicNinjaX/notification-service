@@ -1,4 +1,4 @@
-package com.nitish.notification_service.consumer;
+package com.nitish.notification_service.messaging.consumer;
 
 import com.nitish.notification_service.entity.NotificationDelivery;
 import com.nitish.notification_service.entity.NotificationMessage;
