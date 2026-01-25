@@ -56,3 +56,6 @@ app:
       push:
         content-length: ${PUSH_LENGTH}
     max-attempts: ${MAX_ATTEMPTS}
+
+  scheduler:
+    failed-notification-delay: ${FAILED_NOTIFICATION_DELAY}
