@@ -90,4 +90,13 @@ public class OutBoxEvent {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public static OutBoxEvent retry(NotificationMessage message){
+        OutBoxEvent event = new OutBoxEvent();
+        event.setAggregateType(AggregateType.NOTIFICATION_MESSAGE);
+        event.setAggregateId(message.getMessageId());
+        event.setEventType(EventType.MESSAGE_READY);
+        event.setStatus(EventStatus.NEW);
+        return event;
+    }
 }
