@@ -8,6 +8,7 @@ import com.nitish.notification_service.enums.NotificationChannel;
 import com.nitish.notification_service.exception.custom_exception.EntityNotFoundException;
 import com.nitish.notification_service.repository.NotificationDeliveryRepository;
 import com.nitish.notification_service.repository.NotificationMessageRepository;
+import com.nitish.notification_service.repository.OutBoxEventRepository;
 import com.nitish.notification_service.service.impl.NotificationDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +25,15 @@ public class NotificationMessageListener {
     private final NotificationMessageRepository messageRepository;
     private final NotificationDispatcher notificationDispatcher;
     private final NotificationDeliveryRepository deliveryRepository;
+    private final OutBoxEventRepository eventRepository;
 
     private final int maxAttempts;
 
-    public NotificationMessageListener(NotificationMessageRepository messageRepository, NotificationDispatcher notificationDispatcher, NotificationDeliveryRepository deliveryRepository, @Value("${app.notification.max-attempts}") int maxAttempts) {
+    public NotificationMessageListener(NotificationMessageRepository messageRepository, NotificationDispatcher notificationDispatcher, NotificationDeliveryRepository deliveryRepository, OutBoxEventRepository eventRepository, @Value("${app.notification.max-attempts}") int maxAttempts) {
         this.messageRepository = messageRepository;
         this.notificationDispatcher = notificationDispatcher;
         this.deliveryRepository = deliveryRepository;
+        this.eventRepository = eventRepository;
         this.maxAttempts = maxAttempts;
     }
 
@@ -39,26 +42,37 @@ public class NotificationMessageListener {
         logger.info("received event [event id={}, aggregate id={}, event type={}]", event.getEventId(), event.getAggregateId(), event.getEventType());
 
         UUID messageId = event.getAggregateId();
-        NotificationMessage notificationMessage = messageRepository.findMessageWithRequestEntity(messageId, maxAttempts)
+        NotificationMessage message = messageRepository.findMessageWithRequestEntity(messageId)
                 .orElseThrow(() -> new EntityNotFoundException("notification message", messageId));
 
-        int retryCount = notificationMessage.getRetryCount();
-        notificationMessage.setRetryCount(notificationMessage.getRetryCount() + 1); // updating retry count
-
-        NotificationChannel channel = notificationMessage.getRequest().getChannel();
+        NotificationChannel channel = message.getRequest().getChannel();
+        int attempt = message.getRetryCount() + 1;
 
         try {
-            notificationDispatcher.dispatch(notificationMessage);
-            NotificationDelivery delivery = NotificationDelivery.success(notificationMessage, channel, retryCount);
-            deliveryRepository.save(delivery);
+            notificationDispatcher.dispatch(message);
+            deliveryRepository.save(NotificationDelivery.success(message, channel, attempt));
 
-            notificationMessage.setStatus(MessageStatus.SENT);
-            messageRepository.save(notificationMessage);
+            message.setStatus(MessageStatus.SENT);
+            messageRepository.save(message);
         } catch (Exception e) {
-            NotificationDelivery delivery = NotificationDelivery.failure(notificationMessage, channel, e.getMessage(), retryCount);
-            deliveryRepository.save(delivery);
-            messageRepository.save(notificationMessage);
-            throw e;
+            deliveryRepository.save(NotificationDelivery.failure(message, channel, e.getMessage(), attempt));
+            message.setStatus(MessageStatus.FAILED);
+
+            message.setRetryCount(message.getRetryCount() + 1);
+
+            if (message.getRetryCount() >= maxAttempts){
+                message.setStatus(MessageStatus.DEAD);
+            } else {
+                eventRepository.save(OutBoxEvent.retry(messageId));
+            }
+
+            messageRepository.save(message);
+            logger.error(
+                    "notification failed [messageId={}, attempt={}]",
+                    messageId,
+                    attempt,
+                    e
+            );
         }
     }
 
