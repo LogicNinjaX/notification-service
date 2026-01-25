@@ -55,3 +55,4 @@ app:
         content-length: ${SMS_LENGTH}
       push:
         content-length: ${PUSH_LENGTH}
+    max-attempts: ${MAX_ATTEMPTS}
