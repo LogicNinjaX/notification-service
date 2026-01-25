@@ -16,26 +16,29 @@ import java.util.List;
 @Service
 public class OutBoxPublisher {
 
+    private static final Logger logger = LoggerFactory.getLogger(OutBoxPublisher.class);
     private final OutBoxEventRepository eventRepository;
     private final KafkaTemplate<String, OutBoxEvent> kafkaTemplate;
-    private static final Logger logger = LoggerFactory.getLogger(NotificationMessageProducer.class);
 
-    public NotificationMessageProducer(OutBoxEventRepository eventRepository, KafkaTemplate<String, OutBoxEvent> kafkaTemplate) {
+    public OutBoxPublisher(OutBoxEventRepository eventRepository, KafkaTemplate<String, OutBoxEvent> kafkaTemplate) {
         this.eventRepository = eventRepository;
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @Transactional
     @Scheduled(fixedDelay = 60000)
-    public void produceMessage() {
-        List<OutBoxEvent> eventList = eventRepository.getEventsByStatus(EventStatus.NEW, PageRequest.ofSize(50));
+    public void publish() {
+        List<OutBoxEvent> eventList = eventRepository
+                .getEventsByStatus(EventStatus.NEW, PageRequest.ofSize(50));
 
         for (OutBoxEvent event : eventList) {
             kafkaTemplate.send("notification-message", event);
 
             event.setStatus(EventStatus.SENT);
             eventRepository.save(event);
-            logger.info("event published successfully [event id={}, aggregate id={}, event type={}]", event.getEventId(), event.getAggregateId(), event.getEventType());
+            logger.info(
+                    "outbox event published [eventId={}, aggregateId={}]", event.getEventId(), event.getAggregateId()
+            );
         }
     }
 }
