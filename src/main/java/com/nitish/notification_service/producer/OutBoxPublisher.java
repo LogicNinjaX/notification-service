@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class NotificationMessageProducer {
+public class OutBoxPublisher {
 
     private final OutBoxEventRepository eventRepository;
     private final KafkaTemplate<String, OutBoxEvent> kafkaTemplate;
