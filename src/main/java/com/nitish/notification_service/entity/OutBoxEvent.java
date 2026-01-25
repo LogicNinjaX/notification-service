@@ -91,10 +91,10 @@ public class OutBoxEvent {
         this.createdAt = createdAt;
     }
 
-    public static OutBoxEvent retry(NotificationMessage message){
+    public static OutBoxEvent retry(UUID messageId){
         OutBoxEvent event = new OutBoxEvent();
         event.setAggregateType(AggregateType.NOTIFICATION_MESSAGE);
-        event.setAggregateId(message.getMessageId());
+        event.setAggregateId(messageId);
         event.setEventType(EventType.MESSAGE_READY);
         event.setStatus(EventStatus.NEW);
         return event;
