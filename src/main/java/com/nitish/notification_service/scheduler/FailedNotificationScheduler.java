@@ -1,6 +1,6 @@
 package com.nitish.notification_service.scheduler;
 
-import com.nitish.notification_service.service.impl.FailedNotificationService;
+import com.nitish.notification_service.service.FailedNotificationService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
