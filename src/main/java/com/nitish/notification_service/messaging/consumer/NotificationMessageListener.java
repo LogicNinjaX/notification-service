@@ -2,12 +2,15 @@ package com.nitish.notification_service.messaging.consumer;
 
 import com.nitish.notification_service.entity.NotificationDelivery;
 import com.nitish.notification_service.entity.NotificationMessage;
+import com.nitish.notification_service.entity.NotificationRequest;
 import com.nitish.notification_service.entity.OutBoxEvent;
 import com.nitish.notification_service.enums.MessageStatus;
 import com.nitish.notification_service.enums.NotificationChannel;
+import com.nitish.notification_service.enums.RequestStatus;
 import com.nitish.notification_service.exception.custom_exception.EntityNotFoundException;
 import com.nitish.notification_service.repository.NotificationDeliveryRepository;
 import com.nitish.notification_service.repository.NotificationMessageRepository;
+import com.nitish.notification_service.repository.NotificationRequestRepository;
 import com.nitish.notification_service.repository.OutBoxEventRepository;
 import com.nitish.notification_service.service.impl.NotificationDispatcher;
 import org.slf4j.Logger;
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,14 +30,16 @@ public class NotificationMessageListener {
     private final NotificationDispatcher notificationDispatcher;
     private final NotificationDeliveryRepository deliveryRepository;
     private final OutBoxEventRepository eventRepository;
+    private final NotificationRequestRepository requestRepository;
 
     private final int maxAttempts;
 
-    public NotificationMessageListener(NotificationMessageRepository messageRepository, NotificationDispatcher notificationDispatcher, NotificationDeliveryRepository deliveryRepository, OutBoxEventRepository eventRepository, @Value("${app.notification.max-attempts}") int maxAttempts) {
+    public NotificationMessageListener(NotificationMessageRepository messageRepository, NotificationDispatcher notificationDispatcher, NotificationDeliveryRepository deliveryRepository, OutBoxEventRepository eventRepository, NotificationRequestRepository requestRepository, @Value("${app.notification.max-attempts}") int maxAttempts) {
         this.messageRepository = messageRepository;
         this.notificationDispatcher = notificationDispatcher;
         this.deliveryRepository = deliveryRepository;
         this.eventRepository = eventRepository;
+        this.requestRepository = requestRepository;
         this.maxAttempts = maxAttempts;
     }
 
@@ -44,6 +50,14 @@ public class NotificationMessageListener {
         UUID messageId = event.getAggregateId();
         NotificationMessage message = messageRepository.findMessageWithRequestEntity(messageId)
                 .orElseThrow(() -> new EntityNotFoundException("notification message", messageId));
+
+        if (message.getStatus() == MessageStatus.DEAD) {
+            logger.warn("dead message received again, skipping [id={}]", messageId);
+            return;
+        }
+
+        NotificationRequest request = message.getRequest();
+        updateStatusIfPending(request);
 
         NotificationChannel channel = message.getRequest().getChannel();
         int attempt = message.getRetryCount() + 1;
@@ -56,13 +70,14 @@ public class NotificationMessageListener {
             messageRepository.save(message);
         } catch (Exception e) {
             deliveryRepository.save(NotificationDelivery.failure(message, channel, e.getMessage(), attempt));
-            message.setStatus(MessageStatus.FAILED);
 
             message.setRetryCount(message.getRetryCount() + 1);
 
-            if (message.getRetryCount() >= maxAttempts){
+            if (message.getRetryCount() >= maxAttempts) {
                 message.setStatus(MessageStatus.DEAD);
+                logger.error("message moved to DEAD [message id={}]", message.getMessageId());
             } else {
+                message.setStatus(MessageStatus.FAILED);
                 eventRepository.save(OutBoxEvent.retry(messageId));
             }
 
@@ -73,8 +88,34 @@ public class NotificationMessageListener {
                     attempt,
                     e
             );
+        } finally {
+            finalizeRequestIfNeeded(request);
         }
     }
 
+    private void updateStatusIfPending(NotificationRequest request) {
+        if (request.getStatus() == RequestStatus.PENDING) {
+            request.setStatus(RequestStatus.PROCESSING);
+            requestRepository.save(request);
+        }
+    }
+
+    private void finalizeRequestIfNeeded(NotificationRequest request) {
+        boolean hasRunningMessages = messageRepository
+                .existsByRequestAndStatusIn(request, List.of(MessageStatus.QUEUED));
+
+        if (hasRunningMessages) {
+            return;
+        }
+
+        boolean hasFailures = messageRepository
+                .existsByRequestAndStatusIn(request, List.of(MessageStatus.FAILED, MessageStatus.DEAD));
+
+        request.setStatus(
+                hasFailures ? RequestStatus.FAILED : RequestStatus.COMPLETED
+        );
+
+        requestRepository.save(request);
+    }
 
 }
