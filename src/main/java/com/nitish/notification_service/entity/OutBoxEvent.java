@@ -96,6 +96,7 @@ public class OutBoxEvent {
         event.setAggregateType(AggregateType.NOTIFICATION_MESSAGE);
         event.setAggregateId(messageId);
         event.setEventType(EventType.MESSAGE_READY);
+        event.setPayload("message id: "+messageId);
         event.setStatus(EventStatus.NEW);
         return event;
     }
