@@ -9,4 +9,8 @@ public class EntityNotFoundException extends EntityException{
     public EntityNotFoundException(String entityName, UUID id) {
         super(message.formatted(entityName, id));
     }
+
+    public EntityNotFoundException(String message) {
+        super(message);
+    }
 }
