@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TemplateRepository extends JpaRepository<NotificationTemplate, UUID> {
@@ -26,4 +27,12 @@ public interface TemplateRepository extends JpaRepository<NotificationTemplate, 
             AND nt.createdBy.userId = :userId
             """)
     int deleteTemplateById(UUID templateId, UUID userId);
+
+    @Query("""
+            SELECT nt FROM NotificationTemplate nt
+            WHERE nt.createdBy.userId = :creatorId
+            and nt.templateId = :templateId
+            """)
+    Optional<NotificationTemplate> findByCreatorAndTemplateId(UUID creatorId, UUID templateId);
+
 }
