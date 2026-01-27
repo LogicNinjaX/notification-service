@@ -14,9 +14,9 @@ public interface TemplateService {
 
     CreateTemplateResponse createTemplate(UUID userId, CreateTemplateRequest request);
 
-    UpdateTemplateResponse updateTemplate(UUID templateId, UpdateTemplateRequest request);
+    UpdateTemplateResponse updateTemplate(UUID templateId, UUID creatorId, UpdateTemplateRequest request);
 
-    PageResponse<TemplateResponse> getTemplateByCreatorId(UUID creatorId, Pageable pageable);
+    PageResponse<TemplateResponse> getTemplatesByCreatorId(UUID creatorId, Pageable pageable);
 
     void deleteTemplateByUserAndTemplateId(UUID userId, UUID templateId);
 }

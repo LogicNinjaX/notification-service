@@ -29,7 +29,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -55,11 +54,10 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public CreateTemplateResponse createTemplate(UUID userId, CreateTemplateRequest request) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("user", userId));
+        User user = userRepository.findUserWithClient(userId, request.clientId())
+                .orElseThrow(() -> new EntityNotFoundException("user is not found associated with the attached client/organization"));
 
-        Client client = clientRepository.findById(request.clientId())
-                .orElseThrow(() -> new EntityNotFoundException("client", request.clientId()));
+        Client client = user.getClient();
 
         String content = request.content();
 
@@ -106,8 +104,8 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Transactional
     @Override
-    public UpdateTemplateResponse updateTemplate(UUID templateId, UpdateTemplateRequest request) {
-        NotificationTemplate template = templateRepository.findById(templateId)
+    public UpdateTemplateResponse updateTemplate(UUID templateId, UUID creatorId, UpdateTemplateRequest request) {
+        NotificationTemplate template = templateRepository.findByCreatorAndTemplateId(creatorId, templateId)
                 .orElseThrow(() -> new EntityNotFoundException("template", templateId));
 
         if (request.name() != null) template.setName(request.name());
@@ -137,7 +135,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public PageResponse<TemplateResponse> getTemplateByCreatorId(UUID creatorId, Pageable pageable){
+    public PageResponse<TemplateResponse> getTemplatesByCreatorId(UUID creatorId, Pageable pageable){
         Page<TemplateResponse> page = templateRepository.getTemplatesByCreatorId(creatorId, pageable)
                 .map(templateMapper::toTemplateResponse);
         return PageResponse.from(page);
