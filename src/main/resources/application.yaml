@@ -59,6 +59,9 @@ app:
           phone-number: ${PHONE_NUMBER}
       push:
         content-length: ${PUSH_LENGTH}
+      whatsapp:
+        twilio:
+          from-number: ${WA-NUMBER}
     max-attempts: ${MAX_ATTEMPTS}
 
   scheduler:
