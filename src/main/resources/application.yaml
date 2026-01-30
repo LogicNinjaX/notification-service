@@ -53,6 +53,10 @@ app:
     channel-type:
       sms:
         content-length: ${SMS_LENGTH}
+        twilio:
+          sid: ${ACCOUNT_SID}
+          token: ${AUTH_TOKEN}
+          phone-number: ${PHONE_NUMBER}
       push:
         content-length: ${PUSH_LENGTH}
     max-attempts: ${MAX_ATTEMPTS}
