@@ -61,7 +61,9 @@ app:
         content-length: ${PUSH_LENGTH}
       whatsapp:
         twilio:
-          from-number: ${WA-NUMBER}
+          from-number: ${WA_NUMBER}
+      telegram:
+        bot-token: ${TG_BOT_TOKEN}
     max-attempts: ${MAX_ATTEMPTS}
 
   scheduler:
