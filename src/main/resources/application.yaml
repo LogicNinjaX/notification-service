@@ -64,6 +64,12 @@ app:
           from-number: ${WA_NUMBER}
       telegram:
         bot-token: ${TG_BOT_TOKEN}
+      email:
+        allowed-domains:
+          - gmail.com
+          - yahoo.com
+          - hotmail.com
+          - outlook.com
     max-attempts: ${MAX_ATTEMPTS}
 
   scheduler:
