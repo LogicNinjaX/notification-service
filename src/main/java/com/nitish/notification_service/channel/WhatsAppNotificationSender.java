@@ -15,7 +15,7 @@ public class WhatsAppNotificationSender implements NotificationSender {
 
     private static final Logger logger = LoggerFactory.getLogger(WhatsAppNotificationSender.class);
 
-    @Value("${app.notification.channel-type.whatsapp.twilio.from-number}")
+    @Value("${app.notification.channel-type.whatsapp.from-number}")
     private String fromNumber;
 
     @Override

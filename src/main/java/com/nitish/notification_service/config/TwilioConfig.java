@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TwilioConfig {
 
-    @Value("${app.notification.channel-type.sms.twilio.sid}")
+    @Value("${app.twilio.sid}")
     private String accountSid;
 
-    @Value("${app.notification.channel-type.sms.twilio.token}")
+    @Value("${app.twilio.token}")
     private String authToken;
 
     @PostConstruct

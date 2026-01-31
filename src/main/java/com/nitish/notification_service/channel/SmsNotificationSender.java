@@ -15,7 +15,7 @@ public class SmsNotificationSender implements NotificationSender {
 
     private static final Logger logger = LoggerFactory.getLogger(SmsNotificationSender.class);
 
-    @Value("${app.notification.channel-type.sms.twilio.phone-number}")
+    @Value("${app.notification.channel-type.sms.phone-number}")
     private String fromNumber;
 
     @Override
