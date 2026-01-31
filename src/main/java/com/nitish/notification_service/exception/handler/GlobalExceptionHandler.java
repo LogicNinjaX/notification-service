@@ -18,7 +18,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> validationExceptionHandler(MethodArgumentNotValidException ex){
+    public ResponseEntity<ApiResponse<Void>> validationExceptionHandler(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new LinkedHashMap<>();
 
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidStatusException.class)
-    public ResponseEntity<ApiResponse<Void>> invalidStatusHandler(InvalidStatusException e, HttpServletRequest request){
+    public ResponseEntity<ApiResponse<Void>> invalidStatusHandler(InvalidStatusException e, HttpServletRequest request) {
         return ResponseEntity.badRequest().body(
                 ApiResponse.error(
                         "invalid status received",
@@ -42,25 +42,31 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateFieldException.class)
-    public ResponseEntity<ApiResponse<Void>> duplicateFieldHandler(DuplicateFieldException e){
+    public ResponseEntity<ApiResponse<Void>> duplicateFieldHandler(DuplicateFieldException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error("duplicate input found", Collections.singletonMap("details", e.getMessage())));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> entityNotFoundHandler(EntityNotFoundException e){
+    public ResponseEntity<ApiResponse<Void>> entityNotFoundHandler(EntityNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error("record not found", Collections.singletonMap("details", e.getMessage())));
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, VariableNotFoundException.class})
-    public ResponseEntity<ApiResponse<Void>> illegalArgumentHandler(RuntimeException e){
+    @ExceptionHandler
+            ({
+                    IllegalArgumentException.class,
+                    VariableNotFoundException.class,
+                    UnsupportedEmailDomainException.class,
+                    InvalidNotificationRequestException.class
+            })
+    public ResponseEntity<ApiResponse<Void>> illegalArgumentHandler(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error("invalid input found", Collections.singletonMap("details", e.getMessage())));
     }
 
     @ExceptionHandler(TemplateValidationException.class)
-    public ResponseEntity<ApiResponse<Void>> templateValidationHandler(TemplateValidationException e){
+    public ResponseEntity<ApiResponse<Void>> templateValidationHandler(TemplateValidationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("invalid content found", Collections.singletonMap("details", e.getMessage())));
     }
