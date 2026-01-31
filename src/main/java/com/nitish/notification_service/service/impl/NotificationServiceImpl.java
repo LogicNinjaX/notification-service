@@ -9,6 +9,7 @@ import com.nitish.notification_service.exception.custom_exception.EntityStatusEx
 import com.nitish.notification_service.exception.custom_exception.VariableNotFoundException;
 import com.nitish.notification_service.repository.*;
 import com.nitish.notification_service.service.NotificationService;
+import com.nitish.notification_service.util.EmailValidator;
 import com.nitish.notification_service.util.TemplateUtil;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -26,9 +27,10 @@ public class NotificationServiceImpl implements NotificationService {
     private final TemplateRepository templateRepository;
     private final TemplateUtil templateUtil;
     private final ThymeleafTemplateRenderer templateRenderer;
+    private final EmailValidator emailValidator;
     private static final Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
-    public NotificationServiceImpl(NotificationRequestRepository requestRepository, NotificationMessageRepository messageRepository, UserRepository userRepository, OutBoxEventRepository eventRepository, TemplateRepository templateRepository, TemplateUtil templateUtil, ThymeleafTemplateRenderer templateRenderer) {
+    public NotificationServiceImpl(NotificationRequestRepository requestRepository, NotificationMessageRepository messageRepository, UserRepository userRepository, OutBoxEventRepository eventRepository, TemplateRepository templateRepository, TemplateUtil templateUtil, ThymeleafTemplateRenderer templateRenderer, EmailValidator emailValidator) {
         this.requestRepository = requestRepository;
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
@@ -36,6 +38,7 @@ public class NotificationServiceImpl implements NotificationService {
         this.templateRepository = templateRepository;
         this.templateUtil = templateUtil;
         this.templateRenderer = templateRenderer;
+        this.emailValidator = emailValidator;
     }
 
 
@@ -48,13 +51,13 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationTemplate template = templateRepository.findById(request.templateId())
                 .orElseThrow(() -> new EntityNotFoundException("template", request.templateId()));
 
-        if (template.getStatus() != TemplateStatus.ACTIVE)
-            throw new EntityStatusException("template is inactive");
+        if (template.getStatus() != TemplateStatus.ACTIVE) throw new EntityStatusException("template is inactive");
 
         Map<String, Object> variables = request.variables();
         String[] recipients = request.recipients();
 
         validateVariables(variables, template);
+        validateNotificationRequest(template, request);
 
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.setTemplate(template);
@@ -73,6 +76,12 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         logger.info("notification request created successfully [notification id={}]", notificationRequest.getRequestId());
+    }
+
+    private void validateNotificationRequest(NotificationTemplate template, SendNotificationRequest request) {
+        if (template.getChannel() == NotificationChannel.EMAIL){
+            emailValidator.validate(template,request);
+        }
     }
 
     private void validateVariables(Map<String, Object> variables, NotificationTemplate template) {
