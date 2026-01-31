@@ -47,21 +47,16 @@ spring:
           starttls:
             enable: true
 
-
 app:
   notification:
     channel-type:
       sms:
         content-length: ${SMS_LENGTH}
-        twilio:
-          sid: ${ACCOUNT_SID}
-          token: ${AUTH_TOKEN}
-          phone-number: ${PHONE_NUMBER}
+        phone-number: ${PHONE_NUMBER}
       push:
         content-length: ${PUSH_LENGTH}
       whatsapp:
-        twilio:
-          from-number: ${WA_NUMBER}
+        from-number: ${WA_NUMBER}
       telegram:
         bot-token: ${TG_BOT_TOKEN}
       email:
@@ -71,6 +66,9 @@ app:
           - hotmail.com
           - outlook.com
     max-attempts: ${MAX_ATTEMPTS}
+  twilio:
+    sid: ${ACCOUNT_SID}
+    token: ${AUTH_TOKEN}
 
   scheduler:
     failed-notification-delay: ${FAILED_NOTIFICATION_DELAY}
