@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -48,11 +49,12 @@ public class TelegramNotificationSender implements NotificationSender {
         HttpEntity<Map<String, Object>> entity =
                 new HttpEntity<>(payload, headers);
 
-        restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                String.class
-        );
+        try {
+            restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            logger.info("telegram notification sent successfully [chat id={}]", message.getRecipient());
+        } catch (RestClientException e) {
+            logger.error("failed to send telegram notification chat id:{}", message.getRecipient(), e);
+            throw new RuntimeException(e);
+        }
     }
 }
