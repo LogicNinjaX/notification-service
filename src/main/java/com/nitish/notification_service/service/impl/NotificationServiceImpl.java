@@ -12,6 +12,7 @@ import com.nitish.notification_service.service.NotificationService;
 import com.nitish.notification_service.util.EmailValidator;
 import com.nitish.notification_service.util.TemplateUtil;
 import jakarta.transaction.Transactional;
+import org.mapstruct.control.MappingControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,13 +58,9 @@ public class NotificationServiceImpl implements NotificationService {
         String[] recipients = request.recipients();
 
         validateVariables(variables, template);
-        validateNotificationRequest(template, request);
+       // validateNotificationRequest(template, request);
 
-        NotificationRequest notificationRequest = new NotificationRequest();
-        notificationRequest.setTemplate(template);
-        notificationRequest.setRequestedBy(user);
-        notificationRequest.setChannel(template.getChannel());
-        notificationRequest.setStatus(RequestStatus.PENDING);
+        NotificationRequest notificationRequest = createNotificationRequest(template, user);
 
         notificationRequest = requestRepository.save(notificationRequest);
 
@@ -76,6 +73,16 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         logger.info("notification request created successfully [notification id={}]", notificationRequest.getRequestId());
+    }
+
+    private NotificationRequest createNotificationRequest(NotificationTemplate template, User user){
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTemplate(template);
+        notificationRequest.setRequestedBy(user);
+        notificationRequest.setChannel(template.getChannel());
+        notificationRequest.setStatus(RequestStatus.PENDING);
+
+        return notificationRequest;
     }
 
     private void validateNotificationRequest(NotificationTemplate template, SendNotificationRequest request) {
