@@ -14,4 +14,8 @@ public class EmailNotificationProperties {
     public Set<String> getAllowedDomains() {
         return allowedDomains;
     }
+
+    public void setAllowedDomains(Set<String> allowedDomains) {
+        this.allowedDomains = allowedDomains;
+    }
 }
