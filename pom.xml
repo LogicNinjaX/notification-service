@@ -95,6 +95,7 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+<!--		twilio sdk for sending sms, wa messages-->
         <dependency>
             <groupId>com.twilio.sdk</groupId>
             <artifactId>twilio</artifactId>
