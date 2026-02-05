@@ -2,6 +2,7 @@ package com.nitish.notification_service.util.mapper;
 
 import com.nitish.notification_service.dto.request.ClientRegisterRequest;
 import com.nitish.notification_service.dto.response.ClientRegisterResponse;
+import com.nitish.notification_service.dto.response.ClientResponse;
 import com.nitish.notification_service.dto.response.ClientUpdateResponse;
 import com.nitish.notification_service.entity.Client;
 import org.mapstruct.Mapper;
@@ -20,4 +21,6 @@ public interface ClientMapper {
     ClientRegisterResponse toRegisterResponse(Client client);
 
     ClientUpdateResponse toUpdateResponse(Client client);
+
+    ClientResponse toClientResponse(Client client);
 }
