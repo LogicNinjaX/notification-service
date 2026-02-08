@@ -33,4 +33,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             AND client.clientId = :clientId
             """)
     Optional<User> findUserWithClient(UUID userId, UUID clientId);
+
+    Optional<User> findByUsername(String username);
 }
