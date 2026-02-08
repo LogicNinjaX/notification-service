@@ -1,7 +1,7 @@
 package com.nitish.notification_service.enums;
 
 public enum UserRole {
-    ADMIN,
-    CLIENT,
-    USER
+    ROLE_ADMIN,
+    ROLE_CLIENT,
+    ROLE_USER
 }
