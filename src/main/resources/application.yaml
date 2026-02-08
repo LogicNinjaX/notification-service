@@ -72,3 +72,6 @@ app:
 
   scheduler:
     failed-notification-delay: ${FAILED_NOTIFICATION_DELAY}
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXP} # in milliseconds
