@@ -3,6 +3,7 @@ package com.nitish.notification_service.exception.handler;
 import com.nitish.notification_service.dto.response.ApiResponse;
 import com.nitish.notification_service.exception.custom_exception.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -41,11 +42,40 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(DuplicateFieldException.class)
-    public ResponseEntity<ApiResponse<Void>> duplicateFieldHandler(DuplicateFieldException e) {
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> duplicateFieldHandler(DataIntegrityViolationException ex) {
+
+        Throwable cause = ex.getRootCause();
+        String responseMessage = "Duplicate value";
+
+        if (cause != null) {
+            String message = cause.getMessage();
+
+            if (message.contains("uk_client_name")) {
+                responseMessage = "Client name already exists";
+            }
+            else if (message.contains("uk_client_email")) {
+                responseMessage = "Client email already exists";
+            }
+            else if (message.contains("uk_user_username")) {
+                responseMessage = "Username already exists";
+            }
+            else if (message.contains("uk_user_email")) {
+                responseMessage = "User email already exists";
+            }
+            else {
+                responseMessage = message;
+            }
+        }
+
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error("duplicate input found", Collections.singletonMap("details", e.getMessage())));
+                .body(ApiResponse.error(
+                        "Duplicate input found",
+                        Collections.singletonMap("details", responseMessage)
+                ));
     }
+
+
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> entityNotFoundHandler(EntityNotFoundException e) {
