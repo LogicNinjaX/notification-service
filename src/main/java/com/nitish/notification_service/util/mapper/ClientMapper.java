@@ -16,9 +16,9 @@ public interface ClientMapper {
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "clientId", ignore = true)
+    @Mapping(source = "clientDetails.fullName", target = "fullName")
+    @Mapping(source = "clientDetails.email", target = "email")
     Client toClient(ClientRegisterRequest request);
-
-    ClientRegisterResponse toRegisterResponse(Client client);
 
     ClientUpdateResponse toUpdateResponse(Client client);
 
