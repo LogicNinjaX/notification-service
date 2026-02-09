@@ -35,4 +35,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findUserWithClient(UUID userId, UUID clientId);
 
     Optional<User> findByUsername(String username);
+
+    boolean existsByClientClientIdAndRole(UUID clientId, UserRole role);
 }
