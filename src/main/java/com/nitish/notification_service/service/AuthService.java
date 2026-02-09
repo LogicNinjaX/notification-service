@@ -7,9 +7,9 @@ import com.nitish.notification_service.dto.response.UserRegisterResponse;
 
 public interface AuthService {
 
-    ClientRegisterResponse registerClient(ClientRegisterRequest request);
+    ClientRegisterResponse registerAsClient(ClientRegisterRequest request);
 
-    UserRegisterResponse registerUser(UserRegisterRequest request);
+    UserRegisterResponse registerAsUser(UserRegisterRequest request);
 
     String login(String username, String password);
 }

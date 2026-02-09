@@ -8,7 +8,6 @@ import com.nitish.notification_service.dto.response.UserUpdateResponse;
 import com.nitish.notification_service.entity.Client;
 import com.nitish.notification_service.entity.User;
 import com.nitish.notification_service.enums.UserRole;
-import com.nitish.notification_service.exception.custom_exception.DuplicateFieldException;
 import com.nitish.notification_service.exception.custom_exception.EntityNotFoundException;
 import com.nitish.notification_service.repository.ClientRepository;
 import com.nitish.notification_service.repository.UserRepository;
@@ -17,7 +16,6 @@ import com.nitish.notification_service.util.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -42,15 +40,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("client", request.clientId()));
 
         User user = userMapper.toUser(request);
-        user.setRole(UserRole.USER);
-        try {
-            user.setClient(client);
-            user = userRepository.save(user);
-        } catch (DataIntegrityViolationException e) {
-            String message = e.getMessage();
-            if (message.contains("uk_username")) throw new DuplicateFieldException("username already exists");
-            if (message.contains("uk_email")) throw new DuplicateFieldException("email already exists");
-        }
+        user.setRole(UserRole.ROLE_USER);
+        user.setClient(client);
+        user = userRepository.save(user);
 
         logger.info("user record successfully [id={}, username={}]", user.getUserId(), user.getUsername());
         return userMapper.toRegisterResponse(user);

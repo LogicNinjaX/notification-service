@@ -16,6 +16,7 @@ import com.nitish.notification_service.security.CustomUserDetails;
 import com.nitish.notification_service.service.AuthService;
 import com.nitish.notification_service.util.JWTUtil;
 import com.nitish.notification_service.util.mapper.ClientMapper;
+import com.nitish.notification_service.util.mapper.ResponseMapper;
 import com.nitish.notification_service.util.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -37,35 +38,47 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final ClientMapper clientMapper;
+    private final ResponseMapper responseMapper;
     private final JWTUtil jwtUtil;
 
-    public AuthServiceImpl(AuthenticationManager authenticationManager, UserRepository userRepository, ClientRepository clientRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, ClientMapper clientMapper, JWTUtil jwtUtil) {
+    public AuthServiceImpl(AuthenticationManager authenticationManager, UserRepository userRepository, ClientRepository clientRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, ClientMapper clientMapper, ResponseMapper responseMapper, JWTUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.clientRepository = clientRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.clientMapper = clientMapper;
+        this.responseMapper = responseMapper;
         this.jwtUtil = jwtUtil;
-    }
-
-    @Override
-    public ClientRegisterResponse registerClient(ClientRegisterRequest request) {
-        Client client = clientMapper.toClient(request);
-        client.setStatus(ClientStatus.ACTIVE);
-        clientRepository.save(client);
-        logger.info("client registered successfully [id={}, name={}]", client.getClientId(), client.getFullName());
-        return clientMapper.toRegisterResponse(client);
     }
 
     @Transactional
     @Override
-    public UserRegisterResponse registerUser(UserRegisterRequest request) {
+    public ClientRegisterResponse registerAsClient(ClientRegisterRequest request) {
+        Client client = clientMapper.toClient(request);
+        client.setStatus(ClientStatus.ACTIVE);
+
+        User user = userMapper.toUser(request);
+        user.setClient(client);
+        user.setRole(UserRole.ROLE_CLIENT);
+        user.setPassword(passwordEncoder.encode(request.loginDetails().password()));
+
+        client.getUsers().add(user);
+
+        client = clientRepository.save(client);
+
+        logger.info("CLIENT registered successfully [client id={}, user id={}]", client.getClientId(), user.getUserId());
+        return responseMapper.toRegisterResponse(user, client);
+    }
+
+    @Transactional
+    @Override
+    public UserRegisterResponse registerAsUser(UserRegisterRequest request) {
         Client client = clientRepository.findById(request.clientId())
                 .orElseThrow(() -> new EntityNotFoundException("client", request.clientId()));
 
         User user = userMapper.toUser(request);
-        user.setRole(UserRole.USER);
+        user.setRole(UserRole.ROLE_USER);
         user.setPassword(passwordEncoder.encode(request.password()));
         try {
             user.setClient(client);

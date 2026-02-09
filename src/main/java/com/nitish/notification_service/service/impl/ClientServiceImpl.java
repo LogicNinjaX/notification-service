@@ -1,8 +1,6 @@
 package com.nitish.notification_service.service.impl;
 
-import com.nitish.notification_service.dto.request.ClientRegisterRequest;
 import com.nitish.notification_service.dto.request.ClientUpdateRequest;
-import com.nitish.notification_service.dto.response.ClientRegisterResponse;
 import com.nitish.notification_service.dto.response.ClientUpdateResponse;
 import com.nitish.notification_service.entity.Client;
 import com.nitish.notification_service.enums.ClientStatus;
@@ -28,15 +26,6 @@ public class ClientServiceImpl implements ClientService {
     public ClientServiceImpl(ClientRepository clientRepository, ClientMapper clientMapper) {
         this.clientRepository = clientRepository;
         this.clientMapper = clientMapper;
-    }
-
-    @Override
-    public ClientRegisterResponse registerClient(ClientRegisterRequest request) {
-        Client client = clientMapper.toClient(request);
-        client.setStatus(ClientStatus.ACTIVE);
-        clientRepository.save(client);
-        logger.info("client registered successfully [id={}, name={}]", client.getClientId(), client.getFullName());
-        return clientMapper.toRegisterResponse(client);
     }
 
     @Transactional
