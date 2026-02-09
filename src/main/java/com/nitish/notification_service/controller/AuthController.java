@@ -1,8 +1,10 @@
 package com.nitish.notification_service.controller;
 
+import com.nitish.notification_service.dto.request.ClientRegisterRequest;
 import com.nitish.notification_service.dto.request.LoginRequest;
 import com.nitish.notification_service.dto.request.UserRegisterRequest;
 import com.nitish.notification_service.dto.response.ApiResponse;
+import com.nitish.notification_service.dto.response.ClientRegisterResponse;
 import com.nitish.notification_service.dto.response.LoginResponse;
 import com.nitish.notification_service.dto.response.UserRegisterResponse;
 import com.nitish.notification_service.enums.AuthStatus;
@@ -34,9 +36,16 @@ public class AuthController {
                 .body(ApiResponse.success(response, "login successful"));
     }
 
-    @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/register-user", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<UserRegisterResponse>> registerUser(@Valid @RequestBody UserRegisterRequest request) {
-        var response = authService.registerUser(request);
+        var response = authService.registerAsUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response, "registration successful"));
+    }
+
+    @PostMapping(path = "/register-client", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponse<ClientRegisterResponse>> registerClient(@Valid @RequestBody ClientRegisterRequest request) {
+        var response = authService.registerAsClient(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "registration successful"));
     }
