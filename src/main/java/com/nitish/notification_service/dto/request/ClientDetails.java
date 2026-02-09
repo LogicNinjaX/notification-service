@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "client registration schema")
-public record ClientRegisterRequest
+public record ClientDetailsRegisterRequest
         (
                 @Schema(description = "client name", example = "company name/your name")
                 @NotBlank(message = "{client.name.not-blank}")
