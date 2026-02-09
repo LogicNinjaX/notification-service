@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(path = "/user", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<UserRegisterResponse>> registerUser(@RequestBody @Valid UserRegisterRequest request) {
         var response = userService.registerUser(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -39,14 +39,14 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(path = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<UserDetailsResponse>> getUserDetails(@PathVariable UUID userId) {
         var response = userService.getUser(userId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(response, "user record fetched successfully"));
     }
 
-    @GetMapping(path = "/user/my", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/users/my", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<UserDetailsResponse>> getUserDetails(@AuthenticationPrincipal CustomUserDetails userDetails) {
         var response = userService.getUser(userDetails.getUserId());
         return ResponseEntity.status(HttpStatus.OK)
@@ -54,14 +54,14 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(path = "/user/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(path = "/users/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<UserUpdateResponse>> updateUserDetails(@PathVariable UUID userId, @RequestBody @Valid UserUpdateRequest request) {
         var response = userService.updateUserDetails(userId, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(response, "user record updated successfully"));
     }
 
-    @PatchMapping(path = "/user/my", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(path = "/users/my", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<UserUpdateResponse>> updateUserDetails(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody @Valid UserUpdateRequest request) {
         var response = userService.updateUserDetails(userDetails.getUserId(), request);
         return ResponseEntity.status(HttpStatus.OK)
@@ -69,20 +69,20 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping(path = "/user/{userId}")
+    @DeleteMapping(path = "/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping(path = "/user/my")
+    @DeleteMapping(path = "/users/my")
     public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
         userService.deleteUser(userDetails.getUserId());
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping(path = "/user/{userId}/role")
+    @PatchMapping(path = "/users/{userId}/role")
     public ResponseEntity<Void> updateUserRole(@PathVariable UUID userId, @RequestParam UserRole role) {
         userService.updateUserRole(userId, role);
         return ResponseEntity.noContent().build();
