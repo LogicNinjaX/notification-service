@@ -3,9 +3,6 @@ package com.nitish.notification_service.dto.request;
 import com.nitish.notification_service.enums.ContentType;
 import com.nitish.notification_service.enums.NotificationChannel;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
 
 public record CreateTemplateRequest
         (
@@ -19,9 +16,6 @@ public record CreateTemplateRequest
 
                 @NotBlank(message = "{template.content.not.blank}")
                 String content,
-
-                @NotNull(message = "{client.id.not-null}")
-                UUID clientId,
 
                 ContentType contentType
         ) { }
