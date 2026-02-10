@@ -8,9 +8,11 @@ import com.nitish.notification_service.security.CustomUserDetails;
 import com.nitish.notification_service.service.MessageService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +30,7 @@ public class MessageController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','CLIENT','USER')")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<PageResponse<MessageResponse>>> getMessages(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam UUID requestId,
