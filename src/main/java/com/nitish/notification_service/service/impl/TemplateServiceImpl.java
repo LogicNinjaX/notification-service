@@ -54,9 +54,10 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public CreateTemplateResponse createTemplate(UUID userId, CreateTemplateRequest request) {
 
-        User user = userRepository.findUserWithClient(userId, request.clientId())
-                .orElseThrow(() -> new EntityNotFoundException("user is not found associated with the attached client/organization"));
+        User user = userRepository.findUserWithClient(userId)
+                .orElseThrow(() -> new EntityNotFoundException("user not found"));
 
+        if (user.getClient() == null) throw new EntityNotFoundException("User is not associated with any client");
         Client client = user.getClient();
 
         String content = request.content();
