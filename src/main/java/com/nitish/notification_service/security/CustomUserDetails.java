@@ -1,6 +1,7 @@
 package com.nitish.notification_service.security;
 
 import com.nitish.notification_service.entity.User;
+import com.nitish.notification_service.enums.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,10 @@ public class CustomUserDetails implements UserDetails {
 
     public UUID getUserId(){
         return user.getUserId();
+    }
+
+    public UserRole getRole(){
+        return user.getRole();
     }
 
     @Override
