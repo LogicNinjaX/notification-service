@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record SendNotificationRequest
         (
-                @NotBlank(message = "{template.id.not.blank}")
+                //@NotBlank(message = "{template.id.not.blank}")
                 UUID templateId,
                 Map<String, Object> variables,
                 String[] recipients
