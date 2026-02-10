@@ -30,9 +30,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             SELECT u FROM User u
             JOIN FETCH u.client client
             WHERE u.userId = :userId
-            AND client.clientId = :clientId
             """)
-    Optional<User> findUserWithClient(UUID userId, UUID clientId);
+    Optional<User> findUserWithClient(UUID userId);
 
     Optional<User> findByUsername(String username);
 
