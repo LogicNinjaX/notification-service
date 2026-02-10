@@ -3,6 +3,7 @@ package com.nitish.notification_service.repository;
 import com.nitish.notification_service.entity.NotificationMessage;
 import com.nitish.notification_service.entity.NotificationRequest;
 import com.nitish.notification_service.enums.MessageStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,4 +32,16 @@ public interface NotificationMessageRepository extends JpaRepository<Notificatio
 
     boolean existsByRequestAndStatusIn(NotificationRequest request, Collection<MessageStatus> statuses);
 
+    @Query("""
+            SELECT nm FROM NotificationMessage nm
+            WHERE nm.request.requestId = :requestId
+            """)
+    Page<NotificationMessage> findAllMessagesByRequestId(UUID requestId, Pageable pageable);
+
+    @Query("""
+            SELECT nm FROM NotificationMessage nm
+            WHERE nm.request.requestId = :requestId
+            AND nm.request.requestedBy.userId = :userId
+            """)
+    Page<NotificationMessage> findAllMessagesByRequestIdAndUserId(UUID requestId, UUID userId, Pageable pageable);
 }
