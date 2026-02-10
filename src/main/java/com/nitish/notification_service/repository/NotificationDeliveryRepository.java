@@ -19,14 +19,14 @@ public interface NotificationDeliveryRepository extends JpaRepository<Notificati
 
     @Query("""
             SELECT nd FROM NotificationDelivery nd
-            WHERE nr.message.request.requestedBy.userId = :userId
-            AND nr.message.request.requestId = :requestId
+            WHERE nd.message.request.requestedBy.userId = :userId
+            AND nd.message.request.requestId = :requestId
             """)
     Page<NotificationDelivery> findDeliveriesByUserIdAndRequestId(UUID userId, UUID requestId, Pageable pageable);
 
     @Query("""
             SELECT nd FROM NotificationDelivery nd
-            AND nr.message.request.requestId = :requestId
+            WHERE nd.message.request.requestId = :requestId
             """)
     Page<NotificationDelivery> findDeliveriesByRequestId(UUID requestId, Pageable pageable);
 }
