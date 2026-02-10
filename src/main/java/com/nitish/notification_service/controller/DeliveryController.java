@@ -49,7 +49,7 @@ public class DeliveryController {
     public ResponseEntity<ApiResponse<PageResponse<DeliveryResponse>>> getDeliveries(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam UUID requestId,
-            @PageableDefault(sort = "createdAt") Pageable pageable
+            @PageableDefault(sort = "sentAt") Pageable pageable
     )
     {
 
