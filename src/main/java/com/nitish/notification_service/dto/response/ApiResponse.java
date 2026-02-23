@@ -1,14 +1,28 @@
 package com.nitish.notification_service.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@Schema(description = "Standard API response wrapper")
 public class ApiResponse<T> {
 
+    @Schema(description = "Indicates whether the request was successful", example = "true")
     private final boolean success;
+
+    @Schema(description = "Human-readable response message", example = "User created successfully")
     private final String message;
+
+    @Schema(description = "Response payload (present only for successful requests)")
     private final T data;
+
+    @Schema(description = "Validation or business errors (present only when request fails)",
+            example = "{\"email\":\"Email already exists\"}")
     private final Map<String, String> error;
+
+    @Schema(description = "Timestamp when the response was generated",
+            example = "2026-02-23T21:15:30")
     private final LocalDateTime timeStamp;
 
     ApiResponse(Builder<T> builder){
