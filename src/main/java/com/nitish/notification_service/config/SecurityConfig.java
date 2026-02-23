@@ -38,7 +38,12 @@ public class SecurityConfig {
 
         security.authorizeHttpRequests(
                 requestMatcher ->
-                        requestMatcher.requestMatchers("/api/auth/**").permitAll()
+                        requestMatcher.requestMatchers(
+                                        "/api/auth/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html"
+                                ).permitAll()
                                 .anyRequest().authenticated()
         );
 
@@ -63,13 +68,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
 
 
     @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService service, PasswordEncoder encoder){
+    public AuthenticationProvider authenticationProvider(UserDetailsService service, PasswordEncoder encoder) {
         var authenticationProvider = new DaoAuthenticationProvider(service);
         authenticationProvider.setPasswordEncoder(encoder);
         return authenticationProvider;
