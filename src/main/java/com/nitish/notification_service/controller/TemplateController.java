@@ -47,7 +47,7 @@ public class TemplateController implements TemplateApiDoc {
     (
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable UUID templateId,
-            @RequestBody UpdateTemplateRequest request
+            @Valid @RequestBody UpdateTemplateRequest request
     ){
         var response = templateService.updateTemplate(templateId, user.getUserId(), request);
         return ResponseEntity.status(HttpStatus.OK)
