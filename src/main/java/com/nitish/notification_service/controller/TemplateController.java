@@ -1,5 +1,6 @@
 package com.nitish.notification_service.controller;
 
+import com.nitish.notification_service.controller.doc.TemplateApiDoc;
 import com.nitish.notification_service.dto.request.CreateTemplateRequest;
 import com.nitish.notification_service.dto.request.UpdateTemplateRequest;
 import com.nitish.notification_service.dto.response.*;
@@ -9,16 +10,17 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.http.MediaType.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/templates")
-public class TemplateController {
+public class TemplateController implements TemplateApiDoc {
 
     private final TemplateService templateService;
 
@@ -26,7 +28,8 @@ public class TemplateController {
         this.templateService = templateService;
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<ApiResponse<CreateTemplateResponse>> createTemplate
     (
             @AuthenticationPrincipal CustomUserDetails user,
@@ -38,7 +41,8 @@ public class TemplateController {
                 .body(ApiResponse.success(response, "Template created successfully"));
     }
 
-    @PatchMapping(path = "/{templateId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(path = "/{templateId}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<ApiResponse<UpdateTemplateResponse>> updateTemplate
     (
             @AuthenticationPrincipal CustomUserDetails user,
@@ -50,7 +54,8 @@ public class TemplateController {
                 .body(ApiResponse.success(response, "Template details updated successfully"));
     }
 
-    @GetMapping(path = "/my", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/my", produces = APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<ApiResponse<PageResponse<TemplateResponse>>> getTemplates
     (
             @AuthenticationPrincipal CustomUserDetails user,
@@ -62,7 +67,8 @@ public class TemplateController {
                 .body(ApiResponse.success(pageResponse, "Template details fetched successfully"));
     }
 
-    @DeleteMapping(path = "/{templateId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/{templateId}", produces = APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<Void> deleteTemplate(@AuthenticationPrincipal CustomUserDetails user, @PathVariable UUID templateId){
         templateService.deleteTemplateByUserAndTemplateId(user.getUserId(), templateId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)

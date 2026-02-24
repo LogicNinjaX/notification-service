@@ -1,5 +1,6 @@
 package com.nitish.notification_service.controller;
 
+import com.nitish.notification_service.controller.doc.MessageApiDoc;
 import com.nitish.notification_service.dto.response.ApiResponse;
 import com.nitish.notification_service.dto.response.MessageResponse;
 import com.nitish.notification_service.dto.response.PageResponse;
@@ -8,7 +9,6 @@ import com.nitish.notification_service.security.CustomUserDetails;
 import com.nitish.notification_service.service.MessageService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.http.MediaType.*;
+
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/messages")
-public class MessageController {
+public class MessageController implements MessageApiDoc {
 
     private final MessageService messageService;
 
@@ -30,7 +32,8 @@ public class MessageController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','CLIENT','USER')")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<ApiResponse<PageResponse<MessageResponse>>> getMessages(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam UUID requestId,

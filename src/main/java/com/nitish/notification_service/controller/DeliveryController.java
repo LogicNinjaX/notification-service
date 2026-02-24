@@ -1,5 +1,6 @@
 package com.nitish.notification_service.controller;
 
+import com.nitish.notification_service.controller.doc.DeliveryApiDoc;
 import com.nitish.notification_service.dto.response.ApiResponse;
 import com.nitish.notification_service.dto.response.DeliveryResponse;
 import com.nitish.notification_service.dto.response.PageResponse;
@@ -13,11 +14,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.MediaType.*;
+
 import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/deliveries")
-public class DeliveryController {
+public class DeliveryController implements DeliveryApiDoc {
 
     private final DeliveryService deliveryService;
 
@@ -25,8 +28,9 @@ public class DeliveryController {
         this.deliveryService = deliveryService;
     }
 
-    @GetMapping("/{messageId}")
+    @GetMapping(value = "/{messageId}", produces = APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN')")
+    @Override
     public ResponseEntity<ApiResponse<DeliveryResponse>> getDeliveryByMessageId(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable UUID messageId
@@ -34,18 +38,14 @@ public class DeliveryController {
     {
         DeliveryResponse response = deliveryService.getDeliveryByMessageId(messageId);
 
-        // optional ownership check for non-admin
-//        if (!(user.getRole() == UserRole.ROLE_ADMIN) && !response.getUserId().equals(user.getUserId())) {
-//            throw new AccessDeniedException("Not allowed to access this delivery");
-//        }
-
         return ResponseEntity.ok(
                 ApiResponse.success(response, "Delivery fetched successfully")
         );
     }
 
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN','CLIENT','USER')")
+    @Override
     public ResponseEntity<ApiResponse<PageResponse<DeliveryResponse>>> getDeliveries(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam UUID requestId,
